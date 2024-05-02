@@ -263,3 +263,58 @@ func asyncMocked(seconds: Int) async -> String {
     try? await Task.sleep(nanoseconds: UInt64(1_000_000_000 * seconds))
     return "async"
 }
+
+
+// Glider test 1. move zero items to end without modifying the order of non-zero items, also
+// do all this in place array(without using extra storage)
+
+func moveNonZeroToLastInPlace(items: inout [Int]) {
+    
+    var zeroPosToSwap = -1
+    
+    for (i,item) in items.enumerated() {
+        
+        if item == 0 && zeroPosToSwap == -1 {
+            zeroPosToSwap = i
+            continue
+        }
+        
+        if item != 0 && zeroPosToSwap > -1  {
+            
+            items[zeroPosToSwap] = item
+            items[i] = 0
+            zeroPosToSwap += 1
+            
+        }
+    }
+}
+
+struct Player: Equatable {
+    let playerName: String
+    let rank: Int
+    let score: Double
+    let rating: Int
+}
+
+func sortPlayers(_ players: [Player]) -> [Player] {
+    players.sorted {
+        if $0.rank != $1.rank {
+            return $0.rank < $1.rank
+        } else if $0.score != $1.score {
+            return $0.score > $1.score
+        } else {
+            return $0.rating > $1.rating
+        }
+    }
+}
+
+let a = Player(playerName: "Hari", rank: 1, score: 10.5, rating: 1)
+let b = Player(playerName: "Krishna", rank: 2, score: 10.5, rating: 2)
+let c = Player(playerName: "Bista", rank: 1, score: 11, rating: 3)
+let d = Player(playerName: "H", rank: 2, score: 10.5, rating: 6)
+
+let res1 = sortPlayers([a,b,c,d])
+
+for item in res1 {
+    print(item)
+}
